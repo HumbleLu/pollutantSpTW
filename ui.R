@@ -12,7 +12,10 @@ shinyUI(
                     selected = 20)
       ),
       mainPanel(
-        plotOutput("spot_map")
+        tabsetPanel(type = "tabs", 
+                    tabPanel("Plot", plotOutput("spot_map", width = "90%", height = "500px")), 
+                    tabPanel("Data", tableOutput("table"))
+        )
       )
     )
   )
