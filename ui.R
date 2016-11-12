@@ -1,7 +1,7 @@
 library(shiny)
 shinyUI(
   fluidPage(
-    titlePanel("Taiwan Pollutant"),
+    titlePanel("Pollutant Information in Taiwan"),
     sidebarLayout(
       sidebarPanel(
         actionButton("fetch", label = "Update data"),
@@ -13,8 +13,11 @@ shinyUI(
       ),
       mainPanel(
         tabsetPanel(type = "tabs", 
-                    tabPanel("Plot", plotOutput("spot_map", width = "90%", height = "500px")), 
+                    tabPanel("Map", plotOutput("spot_map", width = "90%", height = "500px")),
+                    tabPanel("3D Scatter Plot", plotlyOutput("plot")),
                     tabPanel("Data", tableOutput("table"))
+                     
+                    
         )
       )
     )

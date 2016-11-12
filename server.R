@@ -56,18 +56,6 @@ spot_map<- function(air.quality, selection){
 
 library(plotly)
 
-stereo_map<- function(air.quality, selection){
-  p.3d<- air.quality[, c("TWD97Lon", "TWD97Lat", selection)]
-  colnames(p.3d)<- c("Longitude", "Latitude", selection)
-  
-  p<- plot_ly(x = p.3d[, 1],
-          y = p.3d[, 2],
-          z = p.3d[, 3],
-          size = p.3d[, 3],
-          color = "red")
-  p
-}
-
 data_display<- function(air.quality, selection){
   dt<- air.quality[, c("TWD97Lon", "TWD97Lat", selection)]
   colnames(dt)<- c("Longitude", "Latitude", selection)
@@ -76,7 +64,7 @@ data_display<- function(air.quality, selection){
 
 # Server
 shinyServer(
-  function(input, output) {
+  function(input, output, session) {
     v <- reactiveValues(data = NULL)
     
     dataset<- reactive({
@@ -101,7 +89,26 @@ shinyServer(
       })
     })
     
+    output$plot <- renderPlotly({
+      
+      if (is.null(v$data)) return(NULL)
+      
+      pt.3d<- v$data[, c("TWD97Lon", "TWD97Lat", input$pollutant, "SiteName")]
+      colnames(pt.3d)<- c("Longitude", "Latitude", "value", "SiteName")
+      
+      pt.3d$size<- pt.3d[, 3]
+      
+      scene = list(camera = list(eye = list(x = -.5, y = -.8, z = 1)))
+      plot_ly(pt.3d, 
+              x = ~Longitude, y = ~Latitude, z = ~value, 
+              type = "scatter3d",
+              size = ~size,
+              text = ~paste('Site: ', SiteName)) %>%
+        layout(scene = scene)
+    })
+    
     output$table<- renderTable({
+      if (is.null(v$data)) return(data.frame())
       dataset()
     })
   }
