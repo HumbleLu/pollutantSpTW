@@ -10,9 +10,6 @@ current_data<- function(){
 
 
 ## Spot map
-library(ggmap)
-library(gridExtra)
-
 spot_map<- function(air.quality, selection){
   map <- get_map(location = 'Taiwan', zoom = 7, maptype = "toner-lite")
   p.map<- ggmap(map) + 
@@ -54,11 +51,9 @@ spot_map<- function(air.quality, selection){
                widths = c(2, 1), heights = c(1,3))
 }
 
-library(plotly)
-
 data_display<- function(air.quality, selection){
-  dt<- air.quality[, c("TWD97Lon", "TWD97Lat", selection)]
-  colnames(dt)<- c("Longitude", "Latitude", selection)
+  dt<- air.quality[, c("SiteName", "TWD97Lon", "TWD97Lat", selection, "PublishTime")]
+  colnames(dt)<- c("SiteName", "Longitude", "Latitude", selection, "PublishTime")
   dt
 }
 
@@ -90,7 +85,6 @@ shinyServer(
     })
     
     output$plot <- renderPlotly({
-      
       if (is.null(v$data)) return(NULL)
       
       pt.3d<- v$data[, c("TWD97Lon", "TWD97Lat", input$pollutant, "SiteName")]
