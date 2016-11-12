@@ -8,4 +8,4 @@ https://humblelu.shinyapps.io/pollutantsptw/
 ## run this app in R
 ```R
 library(shiny)
-runGitHub("twitterViz", "Humblelu")
+runGitHub("pollutantsptw", "Humblelu")
