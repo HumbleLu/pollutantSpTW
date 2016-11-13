@@ -100,7 +100,7 @@ shinyServer(
     
     withProgress(message = 'Preparing Map..', {
       map <- get_map(location = 'Taiwan', zoom = 8, maptype = "toner-lite")
-      startPlot<- ggmap(map) + labs(title = "Taiwan") + xlab(" ") + ylab(" ") + annotate("text", x = 121, y = 24.2, size = 8, label = "Please click \"Update data\"")
+      startPlot<- ggmap(map) + labs(title = "Taiwan") + xlab(" ") + ylab(" ") + annotate("text", x = 121, y = 24.2, size = 8, label = "Please click \"Update data\" to start")
     })
   
     observeEvent(input$fetch, {
