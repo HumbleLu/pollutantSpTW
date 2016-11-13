@@ -1,3 +1,8 @@
 library(ggmap)
 library(gridExtra)
 library(plotly)
+library(geosphere)
+library(sp)
+library(gstat)
+library(mgcv)
+library(geoR)

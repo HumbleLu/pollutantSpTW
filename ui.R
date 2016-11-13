@@ -15,9 +15,12 @@ shinyUI(
         tabsetPanel(type = "tabs", 
                     tabPanel("Map", plotOutput("spot_map", width = "90%", height = "500px")),
                     tabPanel("3D Scatter Plot", plotlyOutput("plot")),
-                    tabPanel("Data", tableOutput("table"))
-                     
-                    
+                    tabPanel("Data", 
+                             h4("Summary Statistics"),
+                             verbatimTextOutput("stats"),
+                             h4("Data"),
+                             tableOutput("table")),
+                    tabPanel("Kriging prediction", plotlyOutput("krig"))
         )
       )
     )

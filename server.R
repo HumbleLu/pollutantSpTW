@@ -8,7 +8,6 @@ current_data<- function(){
   air.quality
 }
 
-
 ## Spot map
 spot_map<- function(air.quality, selection){
   map <- get_map(location = 'Taiwan', zoom = 7, maptype = "toner-lite")
@@ -55,6 +54,39 @@ data_display<- function(air.quality, selection){
   dt<- air.quality[, c("SiteName", "TWD97Lon", "TWD97Lat", selection, "PublishTime")]
   colnames(dt)<- c("SiteName", "Longitude", "Latitude", selection, "PublishTime")
   dt
+}
+
+krig.3d<- function(dt, pollutant, length = 100, model = "exp", sill = 30, range = 2){
+  # convert to geodata
+  dt_geo<- data.frame(
+    dt[, c("TWD97Lon", "TWD97Lat", pollutant)]
+  )
+  colnames(dt_geo)<- c("x","y","z")
+  dt_geo<- as.geodata(dt_geo)
+  
+  # make grid
+  tw_contour<- subset(map_data("world"), region == 'Taiwan')
+  tw_contour<- as.matrix(subset(tw_contour)[,c(1,2)])
+  x <- seq(118,124,length=length)
+  y <- seq(21,27,length=length)
+  gr <- as.matrix(expand.grid(x,y))
+  inside <- in.out(tw_contour,gr)
+  tw.grid<- gr[inside,]
+  colnames(tw.grid)<- c("x", "y")
+  
+  # kriging
+  prediction <- ksline(dt_geo, cov.model=model, cov.pars=c(sill,range), nugget=0,
+                       locations=tw.grid)
+  
+  kriged.data<- as.data.frame(cbind(tw.grid, prediction$predict))
+  colnames(kriged.data)<- c("Longitude", "Latitude", "Prediction")
+  
+  scene = list(camera = list(eye = list(x = -.5, y = -.8, z = 2)))
+  plot_ly(x = ~Longitude, 
+          y = ~Latitude, 
+          z = ~Prediction, 
+          size = kriged.data$Prediction,
+          color = kriged.data$Prediction, kriged.data) %>% layout(scene = scene)
 }
 
 # Server
@@ -105,6 +137,19 @@ shinyServer(
       if (is.null(v$data)) return(data.frame())
       dataset()
     })
+    
+    output$stats<- renderPrint({
+      if (is.null(v$data)) return(NULL)
+      summary(dataset()[,4])
+    })
+    
+    output$krig <- renderPlotly({
+      if (is.null(v$data)) return(NULL)
+      withProgress(message = 'Plotting..', {
+        krig.3d(v$data, input$pollutant)
+      })
+    })
+    
   }
 )
 
